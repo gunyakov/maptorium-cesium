@@ -1,9 +1,4 @@
 //------------------------------------------------------------
-//Init leaflet map
-//------------------------------------------------------------
-$("#leaflet-map").height($(document).height() - $(".navbar-header").height() + 2);
-let map = L.map('leaflet-map').setView([39, 0], 5);
-//------------------------------------------------------------
 //Vars for leaflet 
 //------------------------------------------------------------
 let mapsLayers = {};
@@ -21,9 +16,8 @@ MDraw.onAdd(map);
 //------------------------------------------------------------------------------
 var GPSInfoBar = L.Control.extend({
     options : {
-    position : 'bottomleft'
+        position : 'bottomleft'
     },
-
     onAdd : function(map) {
     // create the control container with a particular class name
     var container = L.DomUtil.get('routeInfo');
@@ -53,33 +47,6 @@ TileGrid.onAdd(map);
 let setTileGrid = function(zoom, zoomOffset) {
     TileGrid.setGrid(zoom, zoomOffset);
 }
-
-let MDOM = new M.MDOM({
-    mapsContainerID: "maps-list",
-    layersContainerID: "layers-list",
-    menuParrentTag: "ul",
-    menuChildTag: "li",
-    menuParrentClass: "",
-    menuChildClass: "",
-    menuSelectedClass: "bg-secondary",
-    gpsRouteButton: "gps-show-route",
-    gpsRouteRecordButton: "gps-record-route",
-    gpsRouteNewButton: "gps-new-route",
-    gpsRouteTimeButton: "gps-sample-time",
-    gpsHistoryButton: "gps-history-list",
-    gpsHistoryCleanButton: "gps-clear-history",
-    toggleClass: "bg-secondary",
-    mapContainerID: "mapMenuContainer",
-    routeListContainer: "route-list"
-});
-
-//------------------------------------------------------------
-//Config for maptorium UI
-//------------------------------------------------------------
-let MUI = new M.Maptorium({
-    vectorMapSupport: false,
-    MDOM: MDOM
-});
 //Save zoom to default config (used to restore when page reload)
 map.on("zoomend", () => {
     MUI.setZoom(map.getZoom());
@@ -101,14 +68,9 @@ $("#gps-new-route").on('click', function(e) {
     }
 });
 $("#b-select-tile").on("click", (ev) => {
-    TileGrid.select(async function(geometry, polygonRef) {
+    TileGrid.select(async function(geometry) {
         let poiID = await MUI.addPOI(geometry);
-        console.log(poiID);
-        if(poiID > 0) {
-            polygonRef.maptoriumID = poiID;
-            polygonRef.bindTooltip('Geometry ' + response.markID);
-            polygonRef.shape = "Polygon";
-        }
+        if(poiID > 0) MDraw.drawPolygon(geometry.points, poiID);
     });
 });
 //------------------------------------------------------------
@@ -227,8 +189,25 @@ $("[data-key=t-change-mode").on("click", function(ev) {
     //Fire when need to show history route
     //------------------------------------------------------------
     MUI.on("history.show", function(points) {
-        console.log("History show");
         MDraw.drawPolyline(points);
+    });
+    //------------------------------------------------------------
+    //Fire when need to draw polygon
+    //------------------------------------------------------------
+    MUI.on("draw.polygon", function(points, ID, options) {
+        MDraw.drawPolygon(points, ID, options);
+    });
+    //------------------------------------------------------------
+    //Fire when need to draw polyline
+    //------------------------------------------------------------
+    MUI.on("draw.polyline", function(points) {
+        MDraw.drawPolyline(points);
+    });
+    //------------------------------------------------------------
+    //Fire when need to draw point
+    //------------------------------------------------------------
+    MUI.on("draw.point", function(points) {
+        MDraw.drawPoint(points);
     });
     //------------------------------------------------------------
     //Init new Maptorium UI after all preparations. Must call last

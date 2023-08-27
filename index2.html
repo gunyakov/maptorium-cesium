@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="cesium/Cesium.js"></script>
+    <style>
+      @import url(cesium/Cesium.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+// let tms = Cesium.ImageryLayer.fromProviderAsync(
+//     Cesium.TileMapServiceImageryProvider.fromUrl(
+//       Cesium.buildModuleUrl("../tile/googlesat"),
+//       {
+//         fileExtension: 'any',
+
+//       }
+//     )
+//   );
+const tms =  Cesium.ImageryLayer.fromProviderAsync(new Cesium.UrlTemplateImageryProvider({
+    url : Cesium.buildModuleUrl('../tile/arcgiselevation') + '/{z}/{x}/{y}.any',
+    tilingScheme : new Cesium.WebMercatorTilingScheme(),
+    maximumLevel : 20
+}));
+const tms2 =  Cesium.ImageryLayer.fromProviderAsync(new Cesium.UrlTemplateImageryProvider({
+    url : Cesium.buildModuleUrl('../tile/googlesat') + '/{z}/{x}/{y}.any',
+    tilingScheme : new Cesium.WebMercatorTilingScheme(),
+    maximumLevel : 20
+}));
+const tms3 =  Cesium.ImageryLayer.fromProviderAsync(new Cesium.UrlTemplateImageryProvider({
+    url : Cesium.buildModuleUrl('../tile/googlehyb') + '/{z}/{x}/{y}.any',
+    tilingScheme : new Cesium.WebMercatorTilingScheme(),
+    maximumLevel : 20
+}));
+const viewer = new Cesium.Viewer("cesiumContainer", {
+  baseLayer: tms2,
+  baseLayerPicker: false,
+  //terrain: tms,
+  geocoder: false,
+});
+const layers = viewer.scene.imageryLayers;
+console.log(layers);
+//layers.remove(tms);
+layers.add(tms3);
+
+
+      //const scene = viewer.scene.imageryLayers;
+
+      //scene.add(tms);
+      // const viewer = new Cesium.Viewer("cesiumContainer",{
+      //   baseLayerPicker: false,
+      //   infoBox: false,
+      //   timeline: false,
+      //   animation: false,
+      //   homeButton: false
+      // });
+
+      // const layers = viewer.scene.imageryLayers;
+
+      // let tms = new Cesium.UrlTemplateImageryProvider({
+      //     url : `cesium/0.jpg`
+      // });
+      // console.log(tms);
+      // layers.addImageryProvider(Cesium.ImageryLayer.fromProviderAsync(tms));
+      // async function init() {
+      //   const tms = await Cesium.TileMapServiceImageryProvider.fromUrl(
+      //     "/tile/googlesat/{z}/{x}/{y}", {
+      //   });
+
+      //   layers.addImageryProvider(tms);
+      // }
+      // init();
+      
+    </script>
+  </body>
+</html>
